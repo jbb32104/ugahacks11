@@ -60,7 +60,7 @@ export default function Web3LoginButton() {
         });
       }
 
-      router.push("/complete-your-profile");
+      router.push("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Wallet sign-in failed");
     } finally {
@@ -76,7 +76,13 @@ export default function Web3LoginButton() {
         className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 border border-purple-400/30 text-white rounded-lg shadow-md hover:shadow-lg hover:shadow-purple-500/20 transition-all font-medium hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
       >
         <svg width="20" height="20" viewBox="0 0 128 128" fill="none">
-          <circle cx="64" cy="64" r="64" fill="currentColor" fillOpacity="0.15" />
+          <circle
+            cx="64"
+            cy="64"
+            r="64"
+            fill="currentColor"
+            fillOpacity="0.15"
+          />
           <path
             d="M44.2 90.5c-2.2 0-4.2-.8-5.8-2.4a8.1 8.1 0 0 1-2.4-5.8V45.7c0-2.2.8-4.2 2.4-5.8a8.1 8.1 0 0 1 5.8-2.4h39.6c2.2 0 4.2.8 5.8 2.4a8.1 8.1 0 0 1 2.4 5.8v4.5h-8.2v-4.5H44.2v36.6h39.6v-4.5H92v4.5c0 2.2-.8 4.2-2.4 5.8a8.1 8.1 0 0 1-5.8 2.4H44.2Zm31.3-18.3-5.8-5.7 5.3-5.3H55.5v-8.2H75l-5.3-5.3 5.8-5.7L90.7 57 75.5 72.2Z"
             fill="currentColor"

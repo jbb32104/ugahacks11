@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
@@ -29,8 +29,6 @@ export default function LoginPage() {
       });
 
       if (error) throw error;
-
-      router.push("/complete-your-profile"); // or your dashboard
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -44,7 +42,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/complete-your-profile/`, // callback route
+        redirectTo: `${window.location.origin}/auth/callback?next=/`, // callback route
       },
     });
 
