@@ -1,12 +1,42 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/context/AuthContext";
+import { createClient } from "@/utils/supabase/client";
 import Navbar from "@/app/components/Navbar";
 export default function Page() {
-  const user  = useAuth();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handlePaymentClick = () => {
+    console.log('User:', user); // Debug log
+    if (user) {
+      router.push("/watch/payment");
+    } else {
+      router.push("/auth/login");
+    }
+  };
+
   return (
     <div className="relative min-h-screen flex flex-col bg-gradient-to-br from-black via-gray-950 to-gray-900 text-white overflow-hidden">
       {/* Glow effects */}
@@ -27,7 +57,7 @@ export default function Page() {
         </div>
 
         <div className="flex gap-3 mt-2">
-          <button className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105" onClick = {user?() => router.push("/auth/login") : () => router.push("/watch/payment")}>
+          <button className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105" onClick={handlePaymentClick}>
             Join the Queue
           </button>
           <Link

@@ -1,14 +1,44 @@
 "use client";
+import { useEffect, useState } from "react";
 import Navbar from "@/app/components/Navbar";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/context/AuthContext";
+import { createClient } from "@/utils/supabase/client";
 
 export default function WatchPage() {
   const [isConnected, setIsConnected] = useState(false);
-  const user  = useAuth();
-  const router = useRouter();
   const YOUTUBE_ID = "4xDzrJKXOOY";
+
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handlePaymentClick = () => {
+    console.log('User:', user); // Debug log
+    if (user) {
+      router.push("/watch/payment");
+    } else {
+      router.push("/auth/login");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-8">
@@ -44,7 +74,7 @@ export default function WatchPage() {
             onLoad={() => setIsConnected(true)}
           />
         </div>
-              <button className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105" onClick = {user?() => router.push("/auth/login") : () => router.push("/watch/payment")}>
+              <button className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105" onClick = {() => user ? router.push("/watch/payment") : router.push("/auth/login")}>
             Join the Queue
           </button>
         <div className="mt-4 text-gray-400 text-sm text-center">

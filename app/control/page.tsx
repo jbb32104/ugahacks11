@@ -12,12 +12,13 @@ export default function Page() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const playerRef = useRef<any>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const wsControlRef = useRef<WebSocket | null>(null);
   const lastJoystickSent = useRef<number>(0);
 
   const [isConnected, setIsConnected] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(100);
 
-  // Timer and redirect
+  // TIMER
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeLeft(prev => {
@@ -31,9 +32,7 @@ export default function Page() {
     return () => clearInterval(interval);
   }, [router]);
 
-  // ... rest of your code remains the same
-
-  // Initialize joystick (nipplejs)
+  // JOYSTICK
   useEffect(() => {
     if (!joystickRef.current) return;
 
@@ -72,7 +71,7 @@ export default function Page() {
     };
   }, []);
 
-  // Load JSMpeg and create player; capture underlying WebSocket for sending
+  // LIVESTREAM
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://jsmpeg.com/jsmpeg.min.js";
