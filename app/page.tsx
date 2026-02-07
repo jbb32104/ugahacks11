@@ -7,10 +7,10 @@ export default function Page() {
       <nav className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <span className="text-lg font-bold tracking-tight">Squirt Car</span>
         <Link
-          href="/login"
+          href="/auth/login"
           className="rounded-full bg-white text-black px-4 py-2 text-sm font-medium hover:bg-white/90 transition-colors"
         >
-          Sign In
+          Login
         </Link>
       </nav>
 
@@ -29,9 +29,12 @@ export default function Page() {
           <button className="rounded-full bg-white text-black px-6 py-3 font-medium hover:bg-white/90 transition-colors">
             Join the Queue
           </button>
-          <button className="rounded-full border border-white/20 px-6 py-3 font-medium hover:bg-white/5 transition-colors">
+          <Link
+            href="/watch"
+            className="rounded-full border border-white/20 px-6 py-3 font-medium hover:bg-white/5 transition-colors"
+          >
             Watch Live
-          </button>
+          </Link>
         </div>
 
         {/* How It Works */}
@@ -54,7 +57,8 @@ export default function Page() {
             <div className="text-3xl">3</div>
             <h3 className="font-semibold">Drive & Squirt</h3>
             <p className="text-sm text-foreground/50">
-              Take the wheel. Use the joystick to drive and hit the squirt button.
+              Take the wheel. Use the joystick to drive and hit the squirt
+              button.
             </p>
           </div>
         </div>
