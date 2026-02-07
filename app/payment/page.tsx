@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Navbar from '@/app/components/Navbar';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram, LAMPORTS_PER_SOL, Transaction } from '@solana/web3.js';
+import router from 'next/dist/shared/lib/router/router';
 
 export default function PaymentPage() {
   const { connection } = useConnection();
@@ -128,7 +129,7 @@ export default function PaymentPage() {
               <div className="mt-2">
                 <a
                   href={explorerBase(status.replace('Payment confirmed — tx: ', ''))}
-                  target="_blank"
+                  target="/control"
                   rel="noreferrer"
                   className="text-amber-400 underline"
                 >

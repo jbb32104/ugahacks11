@@ -1,10 +1,13 @@
 "use client";
 import Navbar from "@/app/components/Navbar";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function WatchPage() {
   const [isConnected, setIsConnected] = useState(false);
-
+  const user  = useAuth();
+  const router = useRouter();
   const YOUTUBE_ID = "4xDzrJKXOOY";
 
   return (
@@ -41,7 +44,9 @@ export default function WatchPage() {
             onLoad={() => setIsConnected(true)}
           />
         </div>
-
+              <button className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105" onClick = {user?() => router.push("/auth/login") : () => router.push("/control")}>
+            Join the Queue
+          </button>
         <div className="mt-4 text-gray-400 text-sm text-center">
           Streaming from YouTube
         </div>
