@@ -5,8 +5,6 @@ import { useState } from "react";
 export default function WatchPage() {
   const [isConnected, setIsConnected] = useState(false);
 
-  // Replace VIDEO_ID with the YouTube video ID or live stream ID you want to embed.
-  // Example: const YOUTUBE_ID = "dQw4w9WgXcQ";
   const YOUTUBE_ID = "4xDzrJKXOOY";
 
   return (
@@ -33,8 +31,6 @@ export default function WatchPage() {
             {isConnected ? "Stream Loaded" : "Loading Stream"}
           </span>
         </div>
-
-        {/* Responsive YouTube embed (16:9) */}
         <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
           <iframe
             title="YouTube Live Stream"
