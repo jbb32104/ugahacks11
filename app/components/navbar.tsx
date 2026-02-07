@@ -10,7 +10,7 @@ const NavBar = () => {
     return (
         <header>
             <nav className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-            <span className="text-lg font-bold tracking-tight">Squirt Car</span>
+            <span className="text-lg font-bold tracking-tight"><Link href="./">Squirt Car</Link></span>
             {isLoggedIn ? (
                 <div className = "flex justify-between gap-4">
                     <span>
@@ -20,7 +20,7 @@ const NavBar = () => {
                 </div>
                 ): (
                 <Link href="../login"
-                className="rounded-full bg-white text-black px-4 py-2 text-sm font-medium hover:bg-white/90 transition-colors">
+                className="rounded-full bg-white border border-white/20 text-black px-6 py-3 text-sm font-medium hover:bg-white/90 transition-colors">
                     Sign In
                 </Link>
                 )
