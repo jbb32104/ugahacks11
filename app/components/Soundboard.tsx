@@ -1,78 +1,44 @@
 'use client';
-
-import { useState } from 'react';
+import React from "react";
 
 export interface SoundboardButton {
   id: number;
   label: string;
-  onClick: () => void;
+  command?: any;
 }
 
-export function Soundboard() {
-  const [buttons, setButtons] = useState<SoundboardButton[]>([
-    {
-      id: 1,
-      label: 'Button 1',
-      onClick: () => console.log('Button 1 pressed'),
-    },
-    {
-      id: 2,
-      label: 'Button 2',
-      onClick: () => console.log('Button 2 pressed'),
-    },
-    {
-      id: 3,
-      label: 'Button 3',
-      onClick: () => console.log('Button 3 pressed'),
-    },
-    {
-      id: 4,
-      label: 'Button 4',
-      onClick: () => console.log('Button 4 pressed'),
-    },
-    {
-      id: 5,
-      label: 'Button 5',
-      onClick: () => console.log('Button 5 pressed'),
-    },
-    {
-      id: 6,
-      label: 'Button 6',
-      onClick: () => console.log('Button 6 pressed'),
-    },
-    {
-      id: 7,
-      label: 'Button 7',
-      onClick: () => console.log('Button 7 pressed'),
-    },
-    {
-      id: 8,
-      label: 'Button 8',
-      onClick: () => console.log('Button 8 pressed'),
-    },
-  ]);
+export function Soundboard({ sendCommand }: { sendCommand?: (cmd: any) => void }) {
+  const buttons: SoundboardButton[] = [
+    { id: 1, label: "SND 1", command: { type: "sound", id: 1 } },
+    { id: 2, label: "SND 2", command: { type: "sound", id: 2 } },
+    { id: 3, label: "SND 3", command: { type: "sound", id: 3 } },
+    { id: 4, label: "SND 4", command: { type: "sound", id: 4 } },
+    { id: 5, label: "SND 5", command: { type: "sound", id: 5 } },
+    { id: 6, label: "SND 6", command: { type: "sound", id: 6 } },
+    { id: 7, label: "SND 7", command: { type: "sound", id: 7 } },
+    { id: 8, label: "SND 8", command: { type: "sound", id: 8 } },
+  ];
 
-  // Method to update a button's label
-  const setButtonLabel = (id: number, label: string): void => {
-    setButtons(buttons.map(btn => btn.id === id ? { ...btn, label } : btn));
-  };
-
-  // Method to update a button's function
-  const setButtonFunction = (id: number, onClick: () => void): void => {
-    setButtons(buttons.map(btn => btn.id === id ? { ...btn, onClick } : btn));
+  const handleClick = (cmd?: any) => {
+    if (sendCommand && cmd) sendCommand(cmd);
+    else console.log("Soundboard click:", cmd);
   };
 
   return (
-    <div className="grid grid-cols-4 gap-4 p-4">
-      {buttons.map((button) => (
-        <button
-          key={button.id}
-          onClick={button.onClick}
-          className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded"
-        >
-          {button.label}
-        </button>
-      ))}
+    <div className="fixed left-0 bottom-0 w-full bg-black/50 backdrop-blur-sm border-t border-gray-800 z-40">
+      <div className="max-w-screen-xl mx-auto px-4 py-3">
+        <div className="grid grid-cols-8 gap-3">
+          {buttons.map((b) => (
+            <button
+              key={b.id}
+              onClick={() => handleClick(b.command)}
+              className="w-full h-14 sm:h-16 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-md text-sm sm:text-base flex items-center justify-center"
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
