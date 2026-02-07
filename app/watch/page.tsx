@@ -1,6 +1,6 @@
 // app/watch/page.tsx
 "use client";
-
+import Navbar from "@/app/components/Navbar";
 import { useEffect, useRef, useState } from "react";
 
 export default function WatchPage() {
@@ -55,6 +55,7 @@ export default function WatchPage() {
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-8">
       <div className="max-w-4xl w-full">
+        <Navbar />
         <h1 className="text-4xl font-bold text-white mb-2 text-center">
           Pi Camera Stream
         </h1>
