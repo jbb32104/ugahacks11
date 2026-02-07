@@ -1,12 +1,28 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Navbar from "@/app/components/Navbar";
+import { Soundboard } from "../components/Soundboard";
 
 export default function Page() {
     const joystickRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isConnected, setIsConnected] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(60);
   
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (!joystickRef.current) return;
 
@@ -16,7 +32,7 @@ export default function Page() {
       manager = nipplejs.default.create({
         zone: joystickRef.current!,
         mode: 'static',
-        position: { left: '65%', bottom: '67%' },
+        position: { left: '65%', bottom: '36%' },
         color: 'gray',
         size: 230,
       });
@@ -77,6 +93,11 @@ export default function Page() {
         document.body.removeChild(script);
       };
     }, []);
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
   return (
     <div className="relative min-h-screen flex flex-col bg-gradient-to-br from-black via-gray-950 to-gray-900 text-white overflow-hidden">
       {/* Glow effects */}
@@ -114,9 +135,20 @@ export default function Page() {
         </div>
       </main>
       <div ref={joystickRef} id="joystick-zone"></div>
-      <button className="absolute bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded text-lg" style={{ left: '65%', bottom: '60%', marginLeft: '130px' }}>
+      
+      {/* Digital Watch Timer */}
+      <div className="absolute" style={{ left: '55%', bottom: '60%', marginLeft: '150px' }}>
+        <div className="bg-gray-900 border-4 border-amber-500 rounded-lg px-12 py-8 shadow-lg" style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.3)' }}>
+          <div className="text-8xl font-mono font-bold text-amber-400 tracking-wider">
+            {formattedTime}
+          </div>
+        </div>
+      </div>
+
+      <button className="absolute bg-red-600 hover:bg-red-700 text-white font-bold py-10 px-20 rounded text-2xl" style={{ left: '67%', bottom: '29%', marginLeft: '150px' }}>
         SQUIRT
       </button>
+      <Soundboard />
     </div>
   );
 }
