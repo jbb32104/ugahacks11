@@ -17,7 +17,7 @@ export default function Page() {
 
         <div className="flex gap-3 mt-2">
           <button className="rounded-full bg-white text-black px-6 py-3 font-medium hover:bg-white/90 transition-colors">
-            Join the Queue
+            <Link href="queue">Join the Queue</Link>
           </button>
           <button className="rounded-full border border-white/20 px-6 py-3 font-medium hover:bg-white/5 transition-colors">
             Watch Live
