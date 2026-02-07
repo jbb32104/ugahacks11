@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import type {SolanaClientConfig} from "@solana/client";
+import {SolanaProvider} from "./solanaprovider";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -12,6 +14,12 @@ import { AuthProvider } from "@/app/context/AuthContext";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
+const defaultConfig: SolanaClientConfig = {
+   cluster: "devnet",
+  rpc: "https://api.devnet.solana.com",
+  websocket: "wss://api.devnet.solana.com",
+}
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   const endpoint = useMemo(
     () =>
@@ -22,12 +30,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <SolanaProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </SolanaProvider>
   );
 }
