@@ -133,7 +133,7 @@ export default function LoginPage() {
 
           {/* Sign Up Redirect */}
           <div className="mt-6 text-center text-sm text-gray-400">
-            Don&apos;llt have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/auth/sign-up"
               className="font-semibold text-amber-400 hover:underline underline-offset-4"
