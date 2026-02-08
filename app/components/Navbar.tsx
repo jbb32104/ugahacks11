@@ -24,7 +24,7 @@ export default function Navbar() {
         href="/"
         className="text-lg font-bold tracking-tight text-white hover:text-amber-400 transition-colors"
       >
-        Squirt Car
+        Sqwerty Car
       </Link>
 
       <div className="flex items-center gap-4">

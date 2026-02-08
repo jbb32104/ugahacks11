@@ -49,7 +49,7 @@ export default function Page() {
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 gap-6 pt-20">
         <div className="flex flex-col gap-3 max-w-xl">
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight">
-            Squirt Car
+            Sqwerty Car
           </h1>
           <p className="text-lg text-gray-400">
             Pay SOL. Drive an RC car. Squirt people with a water cannon.
