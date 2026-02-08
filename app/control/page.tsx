@@ -6,6 +6,15 @@ import { Soundboard } from "../components/Soundboard";
 
 type Command = { type: string; [k: string]: any };
 
+// Full state interface
+interface ControlState {
+  joystick_x: number;
+  joystick_y: number;
+  squirt: boolean;
+  soundboard: string | null;
+  timestamp: number;
+}
+
 export default function Page() {
   const router = useRouter();
   const joystickRef = useRef<HTMLDivElement | null>(null);
@@ -17,6 +26,15 @@ export default function Page() {
 
   const [isConnected, setIsConnected] = useState(false);
   const [timeLeft, setTimeLeft] = useState(100);
+
+  // Maintain full control state
+  const controlStateRef = useRef<ControlState>({
+    joystick_x: 0,
+    joystick_y: 0,
+    squirt: false,
+    soundboard: null,
+    timestamp: Date.now(),
+  });
 
   // TIMER
   useEffect(() => {
@@ -31,6 +49,63 @@ export default function Page() {
     }, 1000);
     return () => clearInterval(interval);
   }, [router]);
+
+  // CONTROL WEBSOCKET (port 8765)
+  useEffect(() => {
+    const PI_IP = "172.20.136.165";
+    const CONTROL_PORT = "8765";
+
+    try {
+      const controlSocket = new WebSocket(`ws://${PI_IP}:${CONTROL_PORT}`);
+      
+      controlSocket.onopen = () => {
+        console.log("Control WebSocket connected on port 8765");
+        wsControlRef.current = controlSocket;
+      };
+
+      controlSocket.onclose = () => {
+        console.log("Control WebSocket disconnected");
+        wsControlRef.current = null;
+      };
+
+      controlSocket.onerror = (err) => {
+        console.error("Control WebSocket error:", err);
+      };
+
+    } catch (e) {
+      console.error("Failed to create control WebSocket:", e);
+    }
+
+    return () => {
+      if (wsControlRef.current) {
+        try {
+          wsControlRef.current.close();
+        } catch {}
+        wsControlRef.current = null;
+      }
+    };
+  }, []);
+
+  // Helper to send full state over control WebSocket
+  const sendFullState = () => {
+    try {
+      const socket = wsControlRef.current;
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.warn("Control socket not open yet");
+        return;
+      }
+      
+      // Update timestamp
+      controlStateRef.current.timestamp = Date.now();
+      
+      // Send full state as JSON string
+      const stateJson = JSON.stringify(controlStateRef.current);
+      socket.send(stateJson);
+      console.log("Sent state:", stateJson);
+    } catch (err) {
+      console.error("Failed to send state:", err);
+    }
+  };
 
   // JOYSTICK
   useEffect(() => {
@@ -55,12 +130,22 @@ export default function Page() {
 
         const vx = data?.vector?.x ?? 0;
         const vy = data?.vector?.y ?? 0;
-        sendCommand({ type: "joystick", x: vx, y: vy });
+        
+        // Update state
+        controlStateRef.current.joystick_x = vx;
+        controlStateRef.current.joystick_y = vy;
+        
+        // Send full state
+        sendFullState();
       });
 
       manager.on("end", () => {
-        // send neutral position when released
-        sendCommand({ type: "joystick", x: 0, y: 0 });
+        // Update state to neutral position when released
+        controlStateRef.current.joystick_x = 0;
+        controlStateRef.current.joystick_y = 0;
+        
+        // Send full state
+        sendFullState();
       });
     };
 
@@ -96,8 +181,7 @@ export default function Page() {
 
           playerRef.current = player;
 
-          // Attempt to find the internal WebSocket instance used by JSMpeg.
-          // Different JSMpeg builds expose it under different property names.
+          // Store the video stream WebSocket reference
           const maybeWs =
             (player as any)?.source?.ws ||
             (player as any)?.source?.socket ||
@@ -107,20 +191,6 @@ export default function Page() {
 
           if (maybeWs instanceof WebSocket) {
             wsRef.current = maybeWs;
-          } else {
-            // If player created its own WebSocket internally but didn't expose it,
-            // create a secondary control socket to same URL. This requires server support.
-            try {
-              const controlSocket = new WebSocket(`ws://${PI_IP}:${WS_PORT}/${SECRET}`);
-              controlSocket.onopen = () => {
-                wsRef.current = controlSocket;
-              };
-              controlSocket.onclose = () => {
-                if (wsRef.current === controlSocket) wsRef.current = null;
-              };
-            } catch (e) {
-              console.warn("Control websocket fallback failed", e);
-            }
           }
 
           // store reference for cleanup
@@ -147,18 +217,30 @@ export default function Page() {
     };
   }, []);
 
-  // Helper to send JSON commands over the control WebSocket
+  // Updated command handler for backward compatibility
   const sendCommand = (cmd: Command) => {
-    try {
-      const socket = wsRef.current;
-      if (!socket || socket.readyState !== WebSocket.OPEN) {
-        console.warn("Control socket not open yet:", cmd);
-        return;
-      }
-      socket.send(JSON.stringify(cmd));
-    } catch (err) {
-      console.error("Failed to send command:", err);
+    // Update state based on command type
+    if (cmd.type === "joystick") {
+      controlStateRef.current.joystick_x = cmd.x ?? 0;
+      controlStateRef.current.joystick_y = cmd.y ?? 0;
+    } else if (cmd.type === "squirt") {
+      controlStateRef.current.squirt = true;
+      // Auto-reset squirt after sending
+      setTimeout(() => {
+        controlStateRef.current.squirt = false;
+        sendFullState();
+      }, 100);
+    } else if (cmd.type === "soundboard") {
+      controlStateRef.current.soundboard = cmd.sound ?? null;
+      // Auto-reset soundboard after sending
+      setTimeout(() => {
+        controlStateRef.current.soundboard = null;
+        sendFullState();
+      }, 100);
     }
+    
+    // Send full state
+    sendFullState();
   };
 
   // SQUIRT click handler
