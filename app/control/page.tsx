@@ -26,6 +26,13 @@ export default function Page() {
 
   const [isConnected, setIsConnected] = useState(false);
   const [timeLeft, setTimeLeft] = useState(100);
+  const [useLocalStream, setUseLocalStream] = useState(false);
+  const [isCheckingStream, setIsCheckingStream] = useState(true);
+
+  const PI_IP = "172.20.136.165";
+  const WS_PORT = "9000";
+  const SECRET = "test123";
+  const CONTROL_PORT = "8765";
 
   // Maintain full control state
   const controlStateRef = useRef<ControlState>({
@@ -39,10 +46,10 @@ export default function Page() {
   // TIMER
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         const newTime = prev <= 1 ? 0 : prev - 1;
         if (newTime === 0) {
-          router.push('/watch');
+          router.push("/watch");
         }
         return newTime;
       });
@@ -50,14 +57,48 @@ export default function Page() {
     return () => clearInterval(interval);
   }, [router]);
 
-  // CONTROL WEBSOCKET (port 8765)
+  // CHECK IF PI IS ACCESSIBLE (detect local network)
   useEffect(() => {
-    const PI_IP = "172.20.136.165";
-    const CONTROL_PORT = "8765";
+    const checkPiAccess = async () => {
+      try {
+        const testWs = new WebSocket(`ws://${PI_IP}:${WS_PORT}/${SECRET}`);
 
+        const timeout = setTimeout(() => {
+          testWs.close();
+          setUseLocalStream(false);
+          setIsCheckingStream(false);
+          console.log("Pi not accessible, will use Twitch stream");
+        }, 3000); // 3 second timeout
+
+        testWs.onopen = () => {
+          clearTimeout(timeout);
+          console.log("Pi accessible on local network!");
+          setUseLocalStream(true);
+          setIsCheckingStream(false);
+          testWs.close();
+        };
+
+        testWs.onerror = () => {
+          clearTimeout(timeout);
+          console.log("Pi not accessible, will use Twitch stream");
+          setUseLocalStream(false);
+          setIsCheckingStream(false);
+        };
+      } catch (err) {
+        console.log("Pi not accessible, will use Twitch stream");
+        setUseLocalStream(false);
+        setIsCheckingStream(false);
+      }
+    };
+
+    checkPiAccess();
+  }, []);
+
+  // CONTROL WEBSOCKET (port 8765) - always try to connect
+  useEffect(() => {
     try {
       const controlSocket = new WebSocket(`ws://${PI_IP}:${CONTROL_PORT}`);
-      
+
       controlSocket.onopen = () => {
         console.log("Control WebSocket connected on port 8765");
         wsControlRef.current = controlSocket;
@@ -71,7 +112,6 @@ export default function Page() {
       controlSocket.onerror = (err) => {
         console.error("Control WebSocket error:", err);
       };
-
     } catch (e) {
       console.error("Failed to create control WebSocket:", e);
     }
@@ -94,10 +134,10 @@ export default function Page() {
         console.warn("Control socket not open yet");
         return;
       }
-      
+
       // Update timestamp
       controlStateRef.current.timestamp = Date.now();
-      
+
       // Send full state as JSON string
       const stateJson = JSON.stringify(controlStateRef.current);
       socket.send(stateJson);
@@ -130,11 +170,11 @@ export default function Page() {
 
         const vx = data?.vector?.x ?? 0;
         const vy = data?.vector?.y ?? 0;
-        
+
         // Update state
         controlStateRef.current.joystick_x = vx;
         controlStateRef.current.joystick_y = vy;
-        
+
         // Send full state
         sendFullState();
       });
@@ -143,7 +183,7 @@ export default function Page() {
         // Update state to neutral position when released
         controlStateRef.current.joystick_x = 0;
         controlStateRef.current.joystick_y = 0;
-        
+
         // Send full state
         sendFullState();
       });
@@ -156,28 +196,29 @@ export default function Page() {
     };
   }, []);
 
-  // LIVESTREAM
+  // LIVESTREAM - only load jsmpeg if on local network
   useEffect(() => {
+    if (!useLocalStream || isCheckingStream) return;
+
     const script = document.createElement("script");
     script.src = "https://jsmpeg.com/jsmpeg.min.js";
     script.async = true;
 
     script.onload = () => {
       if (canvasRef.current) {
-        const PI_IP = "172.20.136.165";
-        const WS_PORT = "9000";
-        const SECRET = "test123";
-
         try {
           // @ts-ignore
-          const player = new JSMpeg.Player(`ws://${PI_IP}:${WS_PORT}/${SECRET}`, {
-            canvas: canvasRef.current,
-            autoplay: true,
-            audio: false,
-            onSourceEstablished: () => {
-              setIsConnected(true);
+          const player = new JSMpeg.Player(
+            `ws://${PI_IP}:${WS_PORT}/${SECRET}`,
+            {
+              canvas: canvasRef.current,
+              autoplay: true,
+              audio: false,
+              onSourceEstablished: () => {
+                setIsConnected(true);
+              },
             },
-          });
+          );
 
           playerRef.current = player;
 
@@ -215,7 +256,7 @@ export default function Page() {
         wsRef.current = null;
       }
     };
-  }, []);
+  }, [useLocalStream, isCheckingStream]);
 
   // Updated command handler for backward compatibility
   const sendCommand = (cmd: Command) => {
@@ -239,7 +280,7 @@ export default function Page() {
         sendFullState();
       }, 100);
     }
-    
+
     // Send full state
     sendFullState();
   };
@@ -264,26 +305,67 @@ export default function Page() {
         <div className="mb-6 text-center ml-65">
           <span
             className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
-              isConnected ? "bg-green-900 text-green-200" : "bg-red-900 text-red-200"
+              isConnected || !useLocalStream
+                ? "bg-green-900 text-green-200"
+                : "bg-red-900 text-red-200"
             }`}
           >
-            <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-400" : "bg-red-400"}`} />
-            {isConnected ? "Connected" : "Disconnected"}
+            <span
+              className={`w-2 h-2 rounded-full ${isConnected || !useLocalStream ? "bg-green-400" : "bg-red-400"}`}
+            />
+            {isCheckingStream
+              ? "Checking..."
+              : useLocalStream
+                ? isConnected
+                  ? "Low-latency local stream"
+                  : "Connecting..."
+                : "Twitch stream"}
           </span>
         </div>
 
-        <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
-          <canvas ref={canvasRef} width="640" height="480" className="w-full h-auto" />
-        </div>
+        {isCheckingStream ? (
+          <div
+            className="bg-black rounded-lg flex items-center justify-center"
+            style={{ width: 640, height: 480 }}
+          >
+            <div className="text-white">Checking for local stream...</div>
+          </div>
+        ) : useLocalStream ? (
+          <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
+            <canvas
+              ref={canvasRef}
+              width="640"
+              height="480"
+              className="w-full h-auto"
+            />
+          </div>
+        ) : (
+          <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
+            <iframe
+              src="https://player.twitch.tv/?channel=YOUR_TWITCH_CHANNEL&parent=www.sqwerty.tech&parent=localhost"
+              height="480"
+              width="640"
+              allowFullScreen
+              className="w-full"
+            />
+          </div>
+        )}
       </main>
 
       <div ref={joystickRef} id="joystick-zone"></div>
 
       {/* Large stopwatch above SQUIRT */}
-      
-      <div className="absolute" style={{ left: "50%", bottom: "55%", marginLeft: "150px" }}>
-        <div className="bg-gray-900 border-4 border-amber-500 rounded-lg px-12 py-8 shadow-lg" style={{ boxShadow: "0 0 20px rgba(217, 119, 6, 0.3)" }}>
-          <div className="text-8xl font-mono font-bold text-amber-400 tracking-wider">{formattedTime}</div>
+      <div
+        className="absolute"
+        style={{ left: "50%", bottom: "55%", marginLeft: "150px" }}
+      >
+        <div
+          className="bg-gray-900 border-4 border-amber-500 rounded-lg px-12 py-8 shadow-lg"
+          style={{ boxShadow: "0 0 20px rgba(217, 119, 6, 0.3)" }}
+        >
+          <div className="text-8xl font-mono font-bold text-amber-400 tracking-wider">
+            {formattedTime}
+          </div>
         </div>
       </div>
 
@@ -295,11 +377,11 @@ export default function Page() {
           bottom: "29%",
           marginLeft: "150px",
           zIndex: 50,
-        pointerEvents: "auto",
-        }}>
+          pointerEvents: "auto",
+        }}
+      >
         SQUIRT
       </button>
-
 
       {/* Pass sendCommand to Soundboard so its buttons send commands */}
       <Soundboard sendCommand={sendCommand} />

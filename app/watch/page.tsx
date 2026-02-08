@@ -6,7 +6,6 @@ import { createClient } from "@/utils/supabase/client";
 
 export default function WatchPage() {
   const [isConnected, setIsConnected] = useState(false);
-  const YOUTUBE_ID = "4xDzrJKXOOY";
 
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +43,7 @@ export default function WatchPage() {
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-8">
       <div className="max-w-4xl w-full">
         <Navbar />
-        <h1 className="text-4xl font-bold text-white mb-2 text-center">
+        <h1 className="text-4xl font-bold text-white mb-2 text-center pt-20">
           Live Stream
         </h1>
 
@@ -83,7 +82,7 @@ export default function WatchPage() {
           Join the Queue
         </button>
         <div className="mt-4 text-gray-400 text-sm text-center">
-          Streaming from YouTube
+          Streaming from twitch.tv
         </div>
       </div>
     </div>
