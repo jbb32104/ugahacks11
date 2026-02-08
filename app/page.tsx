@@ -11,7 +11,7 @@ export default function Page() {
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -29,7 +29,7 @@ export default function Page() {
   }, []);
 
   const handlePaymentClick = () => {
-    console.log('User:', user); // Debug log
+    console.log("User:", user); // Debug log
     if (user) {
       router.push("/watch/payment");
     } else {
@@ -49,7 +49,7 @@ export default function Page() {
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 gap-6 pt-20">
         <div className="flex flex-col gap-3 max-w-xl">
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight">
-            Squirt Car
+            Sqwerty
           </h1>
           <p className="text-lg text-gray-400">
             Pay SOL. Drive an RC car. Squirt people with a water cannon.
@@ -57,7 +57,10 @@ export default function Page() {
         </div>
 
         <div className="flex gap-3 mt-2">
-          <button className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105" onClick={handlePaymentClick}>
+          <button
+            className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105"
+            onClick={handlePaymentClick}
+          >
             Join the Queue
           </button>
           <Link
