@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Squirt Car | UGAHacks 11",
+  title: "Sqwerty Car",
   description: "Pay SOL. Drive an RC car. Squirt people with a water cannon.",
 };
 

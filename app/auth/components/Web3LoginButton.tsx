@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import bs58 from "bs58";
 import { createClient } from "@/utils/supabase/client";
 
-const SIGN_MESSAGE = "Sign in to Squirt Car";
+const SIGN_MESSAGE = "Sign in to Sqwerty Car";
 
 export default function Web3LoginButton() {
   const { publicKey, signMessage, connected } = useWallet();
@@ -60,7 +60,7 @@ export default function Web3LoginButton() {
         });
       }
 
-      router.push("/");
+      router.push("/payment");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Wallet sign-in failed");
     } finally {
