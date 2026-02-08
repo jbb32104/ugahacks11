@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
             <>
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold tracking-wider bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent mb-2">
-                  Lux
+                  Sqwerty
                 </h1>
                 <h2 className="text-2xl font-bold text-white mb-2">
                   Check Your Email
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
             <>
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold tracking-wider bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent mb-2">
-                  Lux
+                  Sqwerty
                 </h1>
                 <h2 className="text-2xl font-bold text-white mb-2">
                   Reset Your Password
