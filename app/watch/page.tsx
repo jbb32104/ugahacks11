@@ -14,7 +14,7 @@ export default function WatchPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -32,7 +32,7 @@ export default function WatchPage() {
   }, []);
 
   const handlePaymentClick = () => {
-    console.log('User:', user); // Debug log
+    console.log("User:", user); // Debug log
     if (user) {
       router.push("/watch/payment");
     } else {
@@ -66,17 +66,22 @@ export default function WatchPage() {
         </div>
         <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
           <iframe
-            title="YouTube Live Stream"
-            src={`https://www.youtube.com/embed/${YOUTUBE_ID}?autoplay=1&mute=1`}
+            title="Live Stream"
+            src={`https://player.twitch.tv/?channel=mrmlgsniper&parent=www.sqwerty.tech`}
             allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
             allowFullScreen
             className="absolute inset-0 w-full h-full border-0 rounded-lg shadow-2xl"
             onLoad={() => setIsConnected(true)}
           />
         </div>
-              <button className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105" onClick = {() => user ? router.push("/watch/payment") : router.push("/auth/login")}>
-            Join the Queue
-          </button>
+        <button
+          className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-lg font-semibold text-black hover:shadow-2xl hover:shadow-amber-400/25 transition-all duration-300 transform hover:scale-105"
+          onClick={() =>
+            user ? router.push("/watch/payment") : router.push("/auth/login")
+          }
+        >
+          Join the Queue
+        </button>
         <div className="mt-4 text-gray-400 text-sm text-center">
           Streaming from YouTube
         </div>
