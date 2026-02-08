@@ -342,7 +342,7 @@ export default function Page() {
         ) : (
           <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
             <iframe
-              src="https://player.twitch.tv/?channel=YOUR_TWITCH_CHANNEL&parent=www.sqwerty.tech&parent=localhost"
+              src="https://player.twitch.tv/?channel=mrmlgsniper&parent=www.sqwerty.tech"
               height="480"
               width="640"
               allowFullScreen
