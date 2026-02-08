@@ -225,6 +225,7 @@ export default function Page() {
       controlStateRef.current.joystick_y = cmd.y ?? 0;
     } else if (cmd.type === "squirt") {
       controlStateRef.current.squirt = true;
+      console.log("SQUIRT command received");
       // Auto-reset squirt after sending
       setTimeout(() => {
         controlStateRef.current.squirt = false;
@@ -287,12 +288,18 @@ export default function Page() {
       </div>
 
       <button
-        onClick={handleSquirt}
+        onMouseDown={handleSquirt}
         className="absolute bg-red-600 hover:bg-red-700 text-white font-bold py-10 px-20 rounded text-2xl"
-        style={{ left: "67%", bottom: "29%", marginLeft: "150px" }}
-      >
+        style={{
+          left: "67%",
+          bottom: "29%",
+          marginLeft: "150px",
+          zIndex: 50,
+        pointerEvents: "auto",
+        }}>
         SQUIRT
       </button>
+
 
       {/* Pass sendCommand to Soundboard so its buttons send commands */}
       <Soundboard sendCommand={sendCommand} />
